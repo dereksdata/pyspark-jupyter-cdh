@@ -16,8 +16,11 @@ If you have installed the anaconda using parcel at defaults the service should o
 Otherwise edit the ``/etc/init.d/pyspark-jupyter-cdh`` file and change the values below as you desire
 
 ``export DAEMON_USER=hdfs``
+
 ``export DAEMON_NAME=pyspark-jupyter-cdh``
+
 ``export DAEMON_PATH=/var/jupyter``
+
 ``export DAEMON_PORT=8880``
 
 
