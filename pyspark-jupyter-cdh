@@ -1,0 +1,108 @@
+#!/bin/bash
+# pyspark-jupyter-cdh daemon
+# chkconfig: 345 20 80
+# description: pyspark-jupyter-cdh daemon
+# processname: pyspark-jupyter-cdh
+# author: m1no5
+
+# These are the variables to change
+export DAEMON_USER=hdfs
+export DAEMON_NAME=pyspark-jupyter-cdh
+export DAEMON_PATH=/var/jupyter
+# End of variables to change
+
+export PIDFILE=/var/run/$DAEMON_NAME.pid
+export SCRIPTNAME=/etc/init.d/$DAEMON_NAME
+
+setupenv() {
+    # Setup the Log
+
+    export JUPYTER_LOG=/var/log/pyspark-jupyter-cdh/pyspark-jupyter-cdh.log
+    if [[ ! -d /var/log/pyspark-jupyter-cdh ]]; then
+        mkdir -p /var/log/pyspark-jupyter-cdh 
+        chown -R $DAEMON_USER:$DAEMON_USER /var/log/pyspark-jupyter-cdh
+    fi
+
+    # Test for a valid user
+    USER_ENTRY=$(getent passwd $DAEMON_USER)
+    if [[ -z  $DAEMON_USER ]]; then
+        echo "Daemon user $DAEMON_NAME does not exist" >> JUPYTER_LOG
+        exit 1
+    fi
+
+    # Set and test for the anaconda pathing and environment variables
+    ANACONDA=$(command -v anaconda)
+    if [[ -z $ANACONDA ]]; then
+        ANACONDA_PATH=/opt/cloudera/parcels/Anaconda/bin
+    else
+        ANACONDA_PATH=$(dirname "${ANACONDA}")
+    fi
+    export PATH=$ANACONDA_PATH:$PATH
+    export PYSPARK_DRIVER_PYTHON=$ANACONDA_PATH/jupyter
+    export PYSPARK_DRIVER_PYTHON_OPTS="notebook --NotebookApp.open_browser=False --NotebookApp.ip='*' --NotebookApp.port=8880"
+    if [ ! -d "$ANACONDA_PATH" ]; then
+        echo "Unable to find anaconda on the system path or /opt/cloudera/parcels/Anaconda/bin" >> JUPYTER_LOG
+        echo "Please ensure anaconda has been deployed to all hosts in the cluster" >> JUPYTER_LOG
+        exit 1
+    fi
+
+    # Set and create the working path
+    if [[ ! -d $DAEMON_PATH ]]; then
+        mkdir -p $DAEMON_PATH
+        chown -R $DAEMON_USER:$DAEMON_USER $DAEMON_PATH
+    fi
+}
+
+case "$1" in
+start)
+        printf "%-50s" "Starting $DAEMON_NAME..."
+        setupenv
+        cd $DAEMON_PATH
+        su -c "pyspark >> $JUPYTER_LOG 2>&1" hdfs &
+        PID=$!
+        if [ -z $PID ]; then
+            printf "%s\n" "Fail"
+        else
+            echo $PID > $PIDFILE
+            printf "%s\n" "Ok"
+        fi
+;;
+status)
+        printf "%-50s" "Checking $DAEMON_NAME..."
+        if [ -f $PIDFILE ]; then
+            PID=`cat $PIDFILE`
+            if [ -z "`ps axf | grep ${PID} | grep -v grep`" ]; then
+                printf "%s\n" "Process dead but pidfile exists"
+            else
+                echo "Running"
+            fi
+        else
+            printf "%s\n" "Service not running"
+        fi
+;;
+stop)
+        printf "%-50s" "Stopping $DAEMON_NAME"
+        if [ -f $PIDFILE ]; then
+            PID=`cat $PIDFILE`
+            if [[ ! -z $PID ]]; then 
+                kill -9 `pstree -p $PID | sed 's/(/\n(/g' | grep '(' | sed 's/(\(.*\)).*/\1/' | tr "\n" " "`  > /dev/null 2>&1
+            else
+                printf "%s\n" "pidfile was empty"
+            fi
+            #kill -HUP $PID
+            printf "%s\n" "Ok"
+            rm -f $PIDFILE
+        else
+            printf "%s\n" "pidfile not found"
+        fi
+;;
+
+restart)
+  	$0 stop
+  	$0 start
+;;
+
+*)
+        echo "Usage: $0 {status|start|stop|restart}"
+        exit 1
+esac
