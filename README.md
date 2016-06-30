@@ -27,3 +27,6 @@ Otherwise edit the ``/etc/init.d/pyspark-jupyter-cdh`` file and change the value
 
 Start the service
 ``service start pyspark-jupyter-cdh``
+
+Auto start the service
+``chkconfig pyspark-jupyter-cdh on``
