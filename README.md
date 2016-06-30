@@ -20,5 +20,6 @@ export DAEMON_NAME=pyspark-jupyter-cdh
 export DAEMON_PATH=/var/jupyter
 export DAEMON_PORT=8880
 
+
 Start the service
 service start pyspark-jupyter-cdh 
