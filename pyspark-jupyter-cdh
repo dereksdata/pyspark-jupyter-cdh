@@ -9,6 +9,7 @@
 export DAEMON_USER=hdfs
 export DAEMON_NAME=pyspark-jupyter-cdh
 export DAEMON_PATH=/var/jupyter
+export DAEMON_PORT=8880
 # End of variables to change
 
 export PIDFILE=/var/run/$DAEMON_NAME.pid
@@ -19,14 +20,14 @@ setupenv() {
 
     export JUPYTER_LOG=/var/log/pyspark-jupyter-cdh/pyspark-jupyter-cdh.log
     if [[ ! -d /var/log/pyspark-jupyter-cdh ]]; then
-        mkdir -p /var/log/pyspark-jupyter-cdh 
-        chown -R $DAEMON_USER:$DAEMON_USER /var/log/pyspark-jupyter-cdh
+        mkdir -p /var/log/pyspark-jupyter-cdh  >> $JUPYTER_LOG 2>&1
+        chown -R $DAEMON_USER:$DAEMON_USER /var/log/pyspark-jupyter-cdh >> $JUPYTER_LOG 2>&1
     fi
 
     # Test for a valid user
     USER_ENTRY=$(getent passwd $DAEMON_USER)
     if [[ -z  $DAEMON_USER ]]; then
-        echo "Daemon user $DAEMON_NAME does not exist" >> JUPYTER_LOG
+        echo "Daemon user $DAEMON_NAME does not exist" >> $JUPYTER_LOG
         exit 1
     fi
 
@@ -39,18 +40,22 @@ setupenv() {
     fi
     export PATH=$ANACONDA_PATH:$PATH
     export PYSPARK_DRIVER_PYTHON=$ANACONDA_PATH/jupyter
-    export PYSPARK_DRIVER_PYTHON_OPTS="notebook --NotebookApp.open_browser=False --NotebookApp.ip='*' --NotebookApp.port=8880"
+    export PYSPARK_DRIVER_PYTHON_OPTS="notebook --NotebookApp.open_browser=False --NotebookApp.ip='*' --NotebookApp.port=$DAEMON_PORT"
     if [ ! -d "$ANACONDA_PATH" ]; then
-        echo "Unable to find anaconda on the system path or /opt/cloudera/parcels/Anaconda/bin" >> JUPYTER_LOG
-        echo "Please ensure anaconda has been deployed to all hosts in the cluster" >> JUPYTER_LOG
+        echo "Unable to find anaconda on the system path or /opt/cloudera/parcels/Anaconda/bin" >> $JUPYTER_LOG
+        echo "Please ensure anaconda has been deployed to all hosts in the cluster" >> $JUPYTER_LOG
         exit 1
     fi
 
     # Set and create the working path
     if [[ ! -d $DAEMON_PATH ]]; then
-        mkdir -p $DAEMON_PATH
-        chown -R $DAEMON_USER:$DAEMON_USER $DAEMON_PATH
+        mkdir -p $DAEMON_PATH >> $JUPYTER_LOG 2>&1
+        chown -R $DAEMON_USER:$DAEMON_USER $DAEMON_PATH >> $JUPYTER_LOG 2>&1
     fi
+    
+    # Permit the port through IPTables
+    iptables -C INPUT -p tcp --dport $DAEMON_PORT --jump ACCEPT  >> $JUPYTER_LOG 2>&1
+    service iptables save > /dev/null >> $JUPYTER_LOG 2>&1
 }
 
 case "$1" in
@@ -89,7 +94,6 @@ stop)
             else
                 printf "%s\n" "pidfile was empty"
             fi
-            #kill -HUP $PID
             printf "%s\n" "Ok"
             rm -f $PIDFILE
         else
