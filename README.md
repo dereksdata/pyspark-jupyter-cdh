@@ -1,7 +1,7 @@
 # pyspark-jupyter-cdh
 Pyspark Jupyter Notebook Daemon on Cloudera CDH
 
-This repository contains files to support the execution of Jupyter notebooks for Pyspark as a daemon on a Cloudera CDH Cluster using the anaconda parcels, conitunuum.io deployed anaconda or manually installed.
+This repository contains files to support the execution of Jupyter notebooks for Pyspark as a daemon on a Cloudera CDH Cluster using the anaconda parcels.
 
 Assuming you have installed anaconda to your CDH cluster using the following guide(s)
 http://blog.cloudera.com/blog/2016/02/making-python-on-apache-hadoop-easier-with-anaconda-and-cdh/
