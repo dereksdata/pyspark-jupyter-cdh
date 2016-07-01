@@ -38,12 +38,7 @@ RHEL/CentOS: ``sudo yum install libXext libSM libXrender``
 
 Ubuntu/Debian: ``sudo apt-get install libXext libSM libXrender``
 
-When importing matplotlib.pyplot, perform the following in your python code
+When importing matplotlib, add the following to the beginning of your python code
 
 ``%matplotlib notebook``
 
-``import matplotlib as mpl``
-
-``mpl.use('Agg')``
-
-``import matplotlib.pyplot as plt``
