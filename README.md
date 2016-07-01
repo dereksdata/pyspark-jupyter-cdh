@@ -40,7 +40,7 @@ Ubuntu/Debian: ``sudo apt-get install libXext libSM libXrender``
 
 When importing matplotlib.pyplot, perform the following in your python code
 
-``%matplotlib inline``
+``%matplotlib notebook``
 
 ``import matplotlib as mpl``
 
