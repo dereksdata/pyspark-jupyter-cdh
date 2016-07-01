@@ -20,8 +20,10 @@ setupenv() {
 
     export JUPYTER_LOG=/var/log/pyspark-jupyter-cdh/pyspark-jupyter-cdh.log
     if [[ ! -d /var/log/pyspark-jupyter-cdh ]]; then
-        mkdir -p /var/log/pyspark-jupyter-cdh  >> $JUPYTER_LOG 2>&1
-        chown -R $DAEMON_USER:$DAEMON_USER /var/log/pyspark-jupyter-cdh >> $JUPYTER_LOG 2>&1
+        mkdir -p /var/log/pyspark-jupyter-cdh
+        chown -R $DAEMON_USER:$DAEMON_USER /var/log/pyspark-jupyter-cdh
+        touch $JUPYTER_LOG
+        chown $DAEMON_USER:$DAEMON_USER $JUPYTER_LOG
     fi
 
     # Test for a valid user
@@ -97,7 +99,7 @@ stop)
             printf "%s\n" "Ok"
             rm -f $PIDFILE
         else
-            printf "%s\n" "pidfile not found"
+            printf "%s\n" "Service is already stopped. Pidfile not found"
         fi
 ;;
 
