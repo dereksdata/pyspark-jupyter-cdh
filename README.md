@@ -31,6 +31,12 @@ Start the service
 Auto start the service
 ``chkconfig pyspark-jupyter-cdh on``
 
-Note: Depending upon existing lib installations you may need to execute the following commands:
+##Using Matplot 
+Depending upon existing lib installations you may need to execute the following commands:
 RHEL/CentOS: ``sudo yum install libXext libSM libXrender``
 Ubuntu/Debian: ``sudo apt-get install libXext libSM libXrender``
+
+When importing matplotlib.pyplot, perform the following
+``import matplotlib as mpl``
+``mpl.use('Agg')``
+``import matplotlib.pyplot as plt``
