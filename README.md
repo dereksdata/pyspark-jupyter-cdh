@@ -9,13 +9,9 @@ http://www.cloudera.com/documentation/enterprise/latest/topics/spark_ipython.htm
 
 To enable the Jupyter notebook as a service on a host, as root:
 
-copy the ``pyspark-jupyter-cdh`` file to ``/etc/init.d`` and
+copy the ``pyspark-jupyter-cdh`` file to ``/etc/init.d`` and copy the ``pyspark-jupyter-cdh.sh`` file to ``/usr/local/sbin``
 
-copy the ``pyspark-jupyter-cdh.sh`` file to ``/usr/local/sbin``
-
-then ``chmod +x /etc/init.d/pyspark-jupyter-cdh``
-
-then ``chmod +x /usr/local/sbin/pyspark-jupyter-cdh.sh``
+then ``chmod +x /etc/init.d/pyspark-jupyter-cdh`` and ``chmod +x /usr/local/sbin/pyspark-jupyter-cdh.sh``
 
 (ensure the user you wish to use sof the daemon has sufficient permissions to execute ``/usr/local/sbin/pyspark-jupyter-cdh.sh``)
 
