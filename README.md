@@ -15,7 +15,7 @@ then ``chmod +x /etc/init.d/pyspark-jupyter-cdh`` and ``chmod +x /usr/local/sbin
 
 (ensure the user you wish to use sof the daemon has sufficient permissions to execute ``/usr/local/sbin/pyspark-jupyter-cdh.sh``)
 
-If you have installed the anaconda using parcel at defaults the service should operate without changes.
+If you have installed the anaconda using parcel at defaults the service should operate without changes as the hdfs user.
 Otherwise edit the ``/etc/init.d/pyspark-jupyter-cdh`` file and change the values below as you desire
 
 ``export DAEMON_USER=hdfs``
