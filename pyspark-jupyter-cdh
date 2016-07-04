@@ -3,7 +3,9 @@
 # chkconfig: 345 20 80
 # description: pyspark-jupyter-cdh daemon
 # processname: pyspark-jupyter-cdh
+# location: /etc/init.d
 # author: m1no5
+# version 1.1
 
 # These are the variables to change
 export DAEMON_USER=hdfs
@@ -14,6 +16,9 @@ export DAEMON_PORT=8880
 
 export PIDFILE=/var/run/$DAEMON_NAME.pid
 export SCRIPTNAME=/etc/init.d/$DAEMON_NAME
+
+#Source Function Library
+. /etc/rc.d/init.d/functions
 
 setupenv() {
     # Setup the Log
@@ -33,22 +38,6 @@ setupenv() {
         exit 1
     fi
 
-    # Set and test for the anaconda pathing and environment variables
-    ANACONDA=$(command -v anaconda)
-    if [[ -z $ANACONDA ]]; then
-        ANACONDA_PATH=/opt/cloudera/parcels/Anaconda/bin
-    else
-        ANACONDA_PATH=$(dirname "${ANACONDA}")
-    fi
-    export PATH=$ANACONDA_PATH:$PATH
-    export PYSPARK_DRIVER_PYTHON=$ANACONDA_PATH/jupyter
-    export PYSPARK_DRIVER_PYTHON_OPTS="notebook --NotebookApp.open_browser=False --NotebookApp.ip='*' --NotebookApp.port=$DAEMON_PORT"
-    if [ ! -d "$ANACONDA_PATH" ]; then
-        echo "Unable to find anaconda on the system path or /opt/cloudera/parcels/Anaconda/bin" >> $JUPYTER_LOG
-        echo "Please ensure anaconda has been deployed to all hosts in the cluster" >> $JUPYTER_LOG
-        exit 1
-    fi
-
     # Set and create the working path
     if [[ ! -d $DAEMON_PATH ]]; then
         mkdir -p $DAEMON_PATH >> $JUPYTER_LOG 2>&1
@@ -65,7 +54,7 @@ start)
         printf "%-50s" "Starting $DAEMON_NAME..."
         setupenv
         cd $DAEMON_PATH
-        su -c "pyspark >> $JUPYTER_LOG 2>&1" hdfs &
+        su -l $DAEMON_USER -c "/usr/local/sbin/pyspark-jupyter-cdh.sh $DAEMON_PORT >> $JUPYTER_LOG 2>&1" &
         PID=$!
         if [ -z $PID ]; then
             printf "%s\n" "Fail"
