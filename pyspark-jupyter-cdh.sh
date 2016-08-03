@@ -1,6 +1,6 @@
 # Start Jupyter notebook with pyspark
 # location: /usr/local/sbin
-# author: m1no5
+# author: dereksdata
 # version 1.1
 
 if [ -z "$1" ]; then
