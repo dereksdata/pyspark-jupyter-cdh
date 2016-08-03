@@ -4,7 +4,7 @@
 # description: pyspark-jupyter-cdh daemon
 # processname: pyspark-jupyter-cdh
 # location: /etc/init.d
-# author: m1no5
+# author: dereksdata
 # version 1.1
 
 # These are the variables to change
