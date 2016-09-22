@@ -33,6 +33,8 @@ Start the service
 Auto start the service
 ``chkconfig pyspark-jupyter-cdh on``
 
+Point your web browser to your notebook server at http://hostname.domainname:8880
+
 ##Using Matplot 
 When importing matplotlib, add the following to the beginning of your python code
 
